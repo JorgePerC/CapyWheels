@@ -45,6 +45,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 
+TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim8;
 
@@ -56,6 +57,9 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
 
+// NOTE: YOU SHOULD CHANGE THIS DEPENDING ON THE
+// FREQUENCY YOU READ THE ENCODER
+float EncoderReadoutPeriod = 0.005;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +70,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -137,11 +142,21 @@ Error_Handler();
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM8_Init();
   MX_TIM4_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
+  // Init timer for time response with interrupts
+  HAL_TIM_Base_Start_IT(&htim1);
   // Init encoders
   HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
   HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
+
+  	char uart_buf [50];	// Buffer del mensaje
+	int16_t uart_buf_len; // tamaño del mensaje
+	uint32_t tickCount_r; //tiempo transcurrido
+
+
+
 
   // Setup Node handler
   setup();
@@ -155,6 +170,11 @@ Error_Handler();
 
     /* USER CODE BEGIN 3 */
 	  loop();
+	  /*
+	  tickCount_r = TIM1 -> CNT;
+	  uart_buf_len = sprintf(uart_buf, "%u ticks\r\n", tickCount_r);
+	  HAL_UART_Transmit(&huart3, (uint8_t *)uart_buf, uart_buf_len, 100);
+	  */
   }
   /* USER CODE END 3 */
 }
@@ -215,6 +235,53 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(void)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 10;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 34090;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
+
 }
 
 /**
@@ -464,6 +531,16 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+	// Callback for interruption
+	// The name for this function is declared somewhere else in the project
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim){
+	// Since this funcion can be called by any timer, we first check the
+	// interrupt originated from the TIM1
+	if (htim == &htim1){
+		readEncoderVel (EncoderReadoutPeriod);
+	}
+}
 
 /* USER CODE END 4 */
 

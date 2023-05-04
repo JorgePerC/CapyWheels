@@ -14,6 +14,7 @@
 
 void setup(void);
 void loop(void);
+void readEncoderVel(float readoutPeriod);
 
 #ifdef __cplusplus
 }
