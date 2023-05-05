@@ -14,7 +14,11 @@
 
 void setup(void);
 void loop(void);
+// My functions:
+
 void readEncoderVel(float readoutPeriod);
+
+double map(double x, double in_min, double in_max, double out_min, double out_max);
 
 #ifdef __cplusplus
 }

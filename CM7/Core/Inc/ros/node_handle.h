@@ -89,7 +89,7 @@ const uint8_t MODE_SIZE_CHECKSUM  = 4;    // checksum for msg size received from
 const uint8_t MODE_TOPIC_L        = 5;    // waiting for topic id
 const uint8_t MODE_TOPIC_H        = 6;
 const uint8_t MODE_MESSAGE        = 7;
-const uint8_t MODE_MSG_CHECKSUM   = 8;    // checksum for msg and topic id
+const uint8_t MODE_MSG_CHECKSUM   = 8;    // checksum for msg and topic id || ORIGINAL = 8
 
 
 const uint8_t SERIAL_MSG_TIMEOUT  = 20;   // 20 milliseconds to recieve all of message data
@@ -100,8 +100,8 @@ using rosserial_msgs::TopicInfo;
 template<class Hardware,
          int MAX_SUBSCRIBERS = 25,
          int MAX_PUBLISHERS = 25,
-         int INPUT_SIZE = 512,
-         int OUTPUT_SIZE = 512>
+         int INPUT_SIZE = 1024, 			// Expanded from 512 to 1024
+         int OUTPUT_SIZE = 1024>			// Expanded from 512 to 1024
 class NodeHandle_ : public NodeHandleBase_
 {
 protected:

@@ -43,9 +43,9 @@ Core/Src/mainpp.o: ../Core/Src/mainpp.cpp ../Core/Inc/mainpp.h \
  /home/rosmelodic/STM32Cube/Repository/STM32Cube_FW_H7_V1.11.0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
  /home/rosmelodic/STM32Cube/Repository/STM32Cube_FW_H7_V1.11.0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
  ../Core/Inc/std_msgs/String.h ../Core/Inc/std_msgs/Int16.h \
- ../Core/Inc/geometry_msgs/Pose.h ../Core/Inc/geometry_msgs/Point.h \
- ../Core/Inc/geometry_msgs/Quaternion.h ../Core/Inc/geometry_msgs/Twist.h \
- ../Core/Inc/geometry_msgs/Vector3.h
+ ../Core/Inc/std_msgs/Float32.h ../Core/Inc/geometry_msgs/Pose.h \
+ ../Core/Inc/geometry_msgs/Point.h ../Core/Inc/geometry_msgs/Quaternion.h \
+ ../Core/Inc/geometry_msgs/Twist.h ../Core/Inc/geometry_msgs/Vector3.h
 ../Core/Inc/mainpp.h:
 ../Core/Inc/ros.h:
 ../Core/Inc/ros/node_handle.h:
@@ -99,6 +99,7 @@ Core/Src/mainpp.o: ../Core/Src/mainpp.cpp ../Core/Inc/mainpp.h \
 /home/rosmelodic/STM32Cube/Repository/STM32Cube_FW_H7_V1.11.0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
 ../Core/Inc/std_msgs/String.h:
 ../Core/Inc/std_msgs/Int16.h:
+../Core/Inc/std_msgs/Float32.h:
 ../Core/Inc/geometry_msgs/Pose.h:
 ../Core/Inc/geometry_msgs/Point.h:
 ../Core/Inc/geometry_msgs/Quaternion.h:
