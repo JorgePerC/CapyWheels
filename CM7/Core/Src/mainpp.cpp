@@ -3,52 +3,137 @@
  *  Created on: 2023/04/31
  *      Author: Jorge Pérez
  */
-#include <mainpp.h>
+
 #include <ros.h>
+
 	// Standard msgs
-#include <std_msgs/String.h>
-#include <std_msgs/Int16.h>
+//#include <std_msgs/String.h>
+//#include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
+
 	// Geometry msgs
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/PoseStamped.h>
+//#include <geometry_msgs/Twist.h>
+//#include <geometry_msgs/Vector3.h>
+
+#include <mainpp.h>
+#include <stdlib.h>
 
 /* --- Node handler --- */
 ros::NodeHandle nh;
 
 /* --- Messages --- */
-std_msgs::String str_msg;
-std_msgs::Int16 reading;
 std_msgs::Float32 wl;
 std_msgs::Float32 wr;
-
-geometry_msgs::Pose robotPose_msg;
-
-char hello[] = "Hello world!";
+//geometry_msgs::PoseStamped poseMsg;
 
 int lastTick_l = 0;
 int lastTick_r = 0;
 
+uint32_t lastTime_l = 0;
+uint32_t lastTime_r = 0;
+
 float pi = 3.1416;
 float w_leftWheel = 0;
 float w_rightWheel = 0;
-const int encoderTickpr = 538;
-
-int countsL = 0;
+const float encoderTickpRev = 537.667;
 
 /* --- Callback functions --- */
-void readEncoderVel (float readoutPeriod){
-	int tick_l = TIM8 -> CNT;
-	int tick_r = TIM4 -> CNT;
+void resetEncoder(){
+	/*
+	int tick_l = TIM4 -> CNT;
+	if (tick_l == lastTick_l ){
+		w_leftWheel = 0.0;
+		//HAL_GPIO_TogglePin (GPIOE, GPIO_PIN_1); // LED amarillo
+	}
+
+	int tick_r = TIM8 -> CNT;
+	if (lastTick_r == tick_r){
+		w_rightWheel = 0.0;
+	}
+
+	// Update
+	lastTick_l = tick_l;
+	lastTick_r = tick_r;
+	*/
+	int tick_l = TIM4 -> CNT;
+	int tick_r = TIM8 -> CNT;
+
+	//uint32_t cur_time = HAL_GetTick();
+
+	// Do so for left wheel
+	if (abs(lastTick_l - tick_l) > 520){
+		tick_l -= 537;
+	}
+	// Do so for left wheel
+	if (abs(lastTick_r - tick_r) > 520){
+		tick_r -= 537;
+	}
 
 	// Update angular velocities:
-	w_leftWheel = (2*pi*(lastTick_l - tick_l)/encoderTickpr)/(readoutPeriod);
-	w_rightWheel = (2*pi*(lastTick_r - tick_r)/encoderTickpr)/(readoutPeriod);
+	w_rightWheel = 2*pi*(lastTick_r - tick_r)/(encoderTickpRev*(0.005*6.252082554));// * 6.643555243);
+	w_leftWheel = 2*pi*(lastTick_l - tick_l)/(encoderTickpRev*(0.005*6.252082554));
+
+	// Update tick readout
+	lastTick_r = tick_r;
+	lastTick_l = tick_l;
+
+
+}
+
+void readEncoderVelWl (){
+	// Code to avoid jumps when a revolution is completed
+		// This basically happens when the encoder value changes drastically
+		// from the last value to the new one
+		// TODO: Check how this behaves at fast speeds
+
+	int tick_l = TIM4 -> CNT;
+
+	uint32_t cur_time = HAL_GetTick();
+
+	// Do so for left wheel
+	if (abs(lastTick_l - tick_l) > 510){
+		tick_l -= 537;
+	}
+
+	// Update angular velocities:
+	//w_leftWheel = (float) 2*pi*1000/(encoderTickpRev*(cur_time - lastTime_l));// * 6.643555243);
+	w_leftWheel = 2*pi*(lastTick_l - tick_l)*1000/(encoderTickpRev*(cur_time - lastTime_l));// * 6.643555243);
+
+	// Apply sign
+	/*
+	if (tick_l < lastTick_l){
+		w_leftWheel *= -1;
+	}*/
 
 	// Update tick readout
 	lastTick_l = tick_l;
-	lastTick_r = tick_r;
+	lastTime_l = cur_time;
+	HAL_GPIO_TogglePin (GPIOB, GPIO_PIN_14); // RED
+}
 
+void readEncoderVelWr (){
+	// Code to avoid jumps when a revolution is completed
+		// This basically happens when the encoder value changes drastically
+		// from the last value to the new one
+		// TODO: Check how this behaves at fast speeds
+
+	int tick_r = TIM8 -> CNT;
+
+	uint32_t cur_time = HAL_GetTick();
+
+	// Do so for left wheel
+	if (abs(lastTick_r - tick_r) > 510){
+		tick_r -= 537;
+	}
+
+	// Update angular velocities:
+	w_rightWheel = 2*pi*(lastTick_r - tick_r)*1000/(encoderTickpRev*(cur_time - lastTime_r));// * 6.643555243);
+
+	// Update tick readout
+	lastTick_r = tick_r;
+	lastTime_r = cur_time;
+	HAL_GPIO_TogglePin (GPIOE, GPIO_PIN_1);
 }
 
 float map(float x, float in_min, float in_max, float out_min, float out_max) {
@@ -61,6 +146,7 @@ float map(float x, float in_min, float in_max, float out_min, float out_max) {
 	 * */
 void vel_wl_Callback( const std_msgs::Float32 &input_msg){
 	float wl = input_msg.data;
+
 	// Limit wl ranges
 	if (wl > 1.0){
 		wl = 1.0;
@@ -71,8 +157,11 @@ void vel_wl_Callback( const std_msgs::Float32 &input_msg){
 }
 
 void vel_wr_Callback( const std_msgs::Float32 &input_msg){
-
 	float wr = input_msg.data;
+
+	// We invert the rotation to keep all the math happy :D
+	wr *= -1;
+
 	// Limit wl ranges
 	if (wr > 1.0){
 		wr = 1.0;
@@ -89,7 +178,8 @@ ros::Subscriber <std_msgs::Float32> wr_sub("/robot/set_wr", &vel_wr_Callback );
 //ros::Publisher odom_pub("odometry", &robotPose_msg);
 ros::Publisher wl_pub("/robot/wl", &wl);
 ros::Publisher wr_pub("/robot/wr", &wr);
-//ros::Publisher try_pub("encoder", &reading);
+
+//ros::Publisher pose_pub("/robot/pose", &poseMsg);
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
   nh.getHardware()->flush();
@@ -113,8 +203,17 @@ void setup(void)
 	nh.advertise(wl_pub);
 	nh.advertise(wr_pub);
 
+	//nh.advertise(tick_pub);
+	//nh.advertise(wr_tick_pub);
+
 	nh.subscribe(wl_sub);
 	nh.subscribe(wr_sub);
+	// stamped wheels
+	//nh.advertise(pose_pub);
+
+
+	// Time to negociate topics
+	//nh.negotiateTopics();
 
 	HAL_GPIO_TogglePin (GPIOE, GPIO_PIN_1);  // LED Yellow
 
@@ -129,32 +228,30 @@ void loop(void)
 	}else{
 		HAL_GPIO_WritePin (GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);  // LED Green
 		HAL_GPIO_WritePin (GPIOB, GPIO_PIN_14, GPIO_PIN_SET);  // LED RED
+		// Stop motors when disconected
+		TIM3->CCR1 = 1500;
+		TIM2->CCR1 = 1500;
 	}
 
-	//tickCount_r = TIM1 -> CNT;
-
-	bool tocaEnviar = true;
-
-	if (tocaEnviar){
 		// Update data on ros msg
 		wl.data = w_leftWheel;
 		wr.data = w_rightWheel;
+
 		// Send Message
 		wl_pub.publish(&wl);
 		wr_pub.publish(&wr);
-	}
 
-	/*
-	robotPose_msg.position.x = 10;
-	robotPose_msg.position.y = 20;
+		/*
+		poseMsg.header.stamp = nh.now();
+		poseMsg.pose.position.x = w_leftWheel;
+		poseMsg.pose.position.y = w_rightWheel;
 
-	robotPose_msg.orientation.w = 0;
+		pose_pub.publish(&poseMsg);
+		*/
 
-	odom_pub.publish(&robotPose_msg);
-	*/
 	nh.spinOnce();
 
 	// By trial and error, we decided 100 is the corect one
-	HAL_Delay(500);
+	HAL_Delay(40);
 }
 

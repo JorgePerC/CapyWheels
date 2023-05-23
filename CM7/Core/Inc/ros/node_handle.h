@@ -98,8 +98,8 @@ using rosserial_msgs::TopicInfo;
 
 /* Node Handle */
 template<class Hardware,
-         int MAX_SUBSCRIBERS = 25,
-         int MAX_PUBLISHERS = 25,
+         int MAX_SUBSCRIBERS = 5,
+         int MAX_PUBLISHERS = 6,
          int INPUT_SIZE = 1024, 			// Expanded from 512 to 1024
          int OUTPUT_SIZE = 1024>			// Expanded from 512 to 1024
 class NodeHandle_ : public NodeHandleBase_

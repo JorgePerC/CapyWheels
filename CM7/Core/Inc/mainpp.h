@@ -16,7 +16,10 @@ void setup(void);
 void loop(void);
 // My functions:
 
-void readEncoderVel(float readoutPeriod);
+//void readEncoderVel(float readoutPeriod);
+void resetEncoder();
+void readEncoderVelWl();
+void readEncoderVelWr();
 
 double map(double x, double in_min, double in_max, double out_min, double out_max);
 

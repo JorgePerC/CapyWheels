@@ -72,9 +72,9 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_TIM8_Init(void);
 static void MX_TIM4_Init(void);
-static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -146,20 +146,39 @@ Error_Handler();
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM8_Init();
   MX_TIM4_Init();
-  MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
   // Init timer for delta time response with interrupts
-  HAL_TIM_Base_Start_IT(&htim1);
+  //HAL_TIM_Base_Start_IT(&htim1);
   // Init PWM timers
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
   // Init encoders
-  HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
-  HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
+  HAL_TIM_Base_Start_IT(&htim1);
+
+  HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
+  HAL_TIM_Encoder_Start_IT(&htim8, TIM_CHANNEL_ALL);
+
+  //__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE);
+  //__HAL_TIM_ENABLE_IT(&htim4, TIM_IT_TRIGGER);
+  //__HAL_TIM_ENABLE_IT(&htim8, TIM_IT_UPDATE);
+  	  /* Tried:
+  	   * TIM_IT_CC1 -> failed
+  	   * TIM_IT_CC2 -> failed
+  	   * TIM_IT_CC3 -> failed
+  	   * TIM_IT_CC4 -Z failed
+  	   * TIM_IT_UPDATE -> weird data
+  	   * TIM_IT_COM -> failed
+  	   * TIM_IT_TRIGGER -> failed
+  	   * TIM_IT_BREAK -> failed
+  	   */
+  //__HAL_TIM_ENABLE_IT(&htim4, TIM_IT_UPDATE);
+  //__HAL_TIM_ENABLE_IT(&htim8, TIM_IT_CC1 );
+
 
 
   // Setup Node handler
@@ -260,12 +279,12 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 10;
+  htim1.Init.Prescaler = 74;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 34090;
+  htim1.Init.Period = 5000;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
-  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
   {
     Error_Handler();
@@ -308,7 +327,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 36;
+  htim2.Init.Prescaler = 75;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1950;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -367,7 +386,7 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 36;
+  htim3.Init.Prescaler = 75;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 1950;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -429,13 +448,13 @@ static void MX_TIM4_Init(void)
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 538;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
-  sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC1Polarity = TIM_ICPOLARITY_FALLING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
   sConfig.IC1Filter = 1;
-  sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+  sConfig.IC2Polarity = TIM_ICPOLARITY_FALLING;
   sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
   sConfig.IC2Filter = 1;
@@ -479,7 +498,7 @@ static void MX_TIM8_Init(void)
   htim8.Init.Period = 538;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim8.Init.RepetitionCounter = 0;
-  htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
@@ -660,8 +679,31 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim){
 	// Since this funcion can be called by any timer, we first check the
 	// interrupt originated from the TIM1
 	if (htim == &htim1){
-		readEncoderVel (EncoderReadoutPeriod);
+		resetEncoder();
 	}
+/*
+	if (htim == &htim4){
+		readEncoderVelWl ();
+		//HAL_GPIO_TogglePin (GPIOE, GPIO_PIN_1);  // yellow LED
+
+	}
+	if (htim == &htim8){
+		readEncoderVelWr ();
+		//HAL_GPIO_TogglePin (GPIOB, GPIO_PIN_14); // RED LED
+	}
+
+	if (htim == &htim8){
+			readEncoderVelWr ();
+			//HAL_GPIO_TogglePin (GPIOB, GPIO_PIN_14); // RED LED
+		}
+		*/
+}
+void HAL_TIM_IC_CaptureCallback  (TIM_HandleTypeDef * htim){
+	// HAL_TIM_TriggerCallback -> FAILED
+	if (htim == &htim4){
+		readEncoderVelWl ();
+	}
+
 }
 
 /* USER CODE END 4 */
