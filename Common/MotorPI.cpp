@@ -11,9 +11,9 @@
 
 Motor_PI::Motor_PI(Encoder e, TIM_HandleTypeDef * htim) {
 	// TODO Auto-generated constructor stub
-	this->enc = e;
-	this->htimPWM = htim;
-
+	enc = e;
+	htimPWM = htim;
+    encoderFrequency = enc.get_frequency();
 }
 
 Motor_PI::~Motor_PI() {
@@ -22,18 +22,18 @@ Motor_PI::~Motor_PI() {
 
 // ===== Setters =====
 
-Motor_PI::set_MaxVel(float nMax){
-	this->maxVel = nMax;
+void Motor_PI::set_MaxVel(float nMax){
+	maxVel = nMax;
 }
-Motor_PI::set_MinVel(float nMin){
-	this->minVel = nMin;
+void Motor_PI::set_MinVel(float nMin){
+	minVel = nMin;
 }
-Motor_PI::set_Ks(float k_i, float k_p){
+void Motor_PI::set_Ks(float k_i, float k_p){
 	this->k_i = k_i;
 	this->k_p = k_p;
 }
 // ===== Getters =====
-Motor_PI::get_vel(){
+float Motor_PI::get_vel(){
 
 	float vel = enc.get_vel();
 	// Sometimes it overflows into an invalid value
@@ -50,29 +50,50 @@ Motor_PI::get_vel(){
 }
 
 // ===== Others =====
-Motor_PI::map(float x){
-	this->map(x, this->minVel, this->maxVel, this->minFreqPWM, this->maxFreqPWM);
+int Motor_PI::map(float x){
+	return (int) map(x, minVel, maxVel, minFreqPWM, maxFreqPWM);
 }
 
 
-Motor_PI::go_to(float nRef){
+void Motor_PI::go_to(float nRef){
 
 	// Limit the value if the ref is bigger
+        // than our opertarional space
 	if (nRef > maxVel){
 		nRef = maxVel;
-	}else if (wl < minVel){
-		wl = minVel;
+	}else if (nRef < minVel){
+		nRef = minVel;
 	}
-
-	float error = nRef - get(vel);
+    // ===== #CONTROL =====
+	float error = nRef - get_vel();
 
 	// Since we are not working with tasks, we can't actually make whiles
 	if (error <= threshold && error >= -threshold){
+        // Stop if we are within boundaries
 		return;
-	}else{
-		// If we are not on the threshold, keep altering PWM pulse
 	}
+    // If we are not on the threshold, keep altering PWM pulse
+    
+    // Update error on integral term
+    intError += error;
+    // Calculate integral component
+    float intTerm = (1000/encoderFrequency)*intError + lastIntegral;
+
+    // Regulate voltage to motor
+        // Sadly, it isn't torque ;(
+    float control = k_p*error  + k_i*intTerm;
+
+    // Actually move motor
+    htimPWM -> CCR1 = (int) map(control);
+
+    // Update integral component
+    lastIntegral = intTerm;
+        
+	
 
 }
 
+void Motor_PI::stop(){
+    go_to(0);
+}
 

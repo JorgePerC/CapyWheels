@@ -9,14 +9,24 @@
 
 Encoder::Encoder(TIM_HandleTypeDef * htimCounter, int int_freq) {
 	// TODO Auto-generated constructor stub
-	this->htimCounter = htim;
+	this->htimCounter = htimCounter;
 	this->int_freq = int_freq;
 }
 
+Encoder::~Encoder() {
+	// TODO Auto-generated destructor stub
+}
+
 float Encoder::get_vel(){
+	return vel;
+}
 
+int Encoder::get_frequency(){
+	return int_freq;
+}
 
-	int tick = htimCounter -> CNT;
+void Encoder::update(){
+    	int tick = htimCounter -> CNT;
 
 	// Code to avoid jumps when a revolution is completed
 		// This basically happens when the encoder value changes drastically
@@ -31,11 +41,4 @@ float Encoder::get_vel(){
 
 	// Update last readout
 	lastTick = tick;
-	return vel;
 }
-
-
-Encoder::~Encoder() {
-	// TODO Auto-generated destructor stub
-}
-

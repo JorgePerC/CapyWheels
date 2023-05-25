@@ -8,7 +8,7 @@
 #ifndef MOTORPI_H_
 #define MOTORPI_H_
 
-#import <Encoder.h>
+#include <Encoder.h>
 
 /*TODO:
  * ============= Attributes
@@ -33,40 +33,50 @@ private:
 	//Should be defined as radians
 	float maxVel;
 	float minVel;
-
+        // Cleans encoder reading
 	float lastVel;
 
-	float threshold;
 
 
 	// Signal variables
 	int maxFreqPWM;
 	int minFreqPWM;
 
+    int encoderFrequency;
+
 
 	// Control variables
+        // Gains
 	float k_i;
 	float k_p;
 
-	float reference;
+        // Set-point closeness
+	float threshold;
+
+        // PI needed values
+	float reference;    // TODO: remove?
 	float lastError;
+    float intError;
+    float lastIntegral;
 
 	// ========== Methods
 	float map(float x, float in_min, float in_max, float out_min, float out_max);
-	void get_vel();
 public:
 	Motor_PI(Encoder e, TIM_HandleTypeDef * htim);
 
-	float map(float x);
+	int map(float x);
 
 	void set_MaxVel(float nMax);
 	void set_MinVel(float nMin);
+    void set_Ks(float k_i, float k_p);
+
+    void set_encoderFrequency(int f);
+    void set_threshold(int f);
 
 	float get_vel();
 
-	void set_Ks(float k_i, float k_p);
-
 	void go_to(float nRef);
+    void stop();
 
 	virtual ~Motor_PI();
 };

@@ -21,18 +21,31 @@
 class Encoder {
 	TIM_HandleTypeDef * htimCounter;
 
-	int lastTick;
-
-	float encoderRes;
+    // Enchoder characterization 
+    float encoderRes;
 	int ticksPerRevolution;
 
-	int int_freq;
+    // Readings freq
+    int int_freq;
+
+    // Compute signal 
+    const float pi = 3.1416;
+	int lastTick;
+    float vel;
 
 	// ===== Methods
+    void update();
+    void set_ticksPR(int ticks);
 
 public:
 	Encoder(TIM_HandleTypeDef * htimCounter, int int_freq);
-	float get_vel();
+	
+    void set_encoderRes(float res);
+
+    
+    float get_vel();
+    int get_frequency();
+
 
 	virtual ~Encoder();
 };
