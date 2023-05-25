@@ -5,10 +5,11 @@
  *      Author: josue
  */
 
-#ifndef MOTORPI_H_
-#define MOTORPI_H_
+#ifndef MOTORPI_HPP_
+#define MOTORPI_HPP_
 
-#include <Encoder.h>
+#include <Encoder.hpp>
+#include "stm32l4xx_hal.h"
 
 /*TODO:
  * ============= Attributes
@@ -81,4 +82,4 @@ public:
 	virtual ~Motor_PI();
 };
 
-#endif /* MOTORPI_H_ */
+#endif /* MOTORPI_HPP_ */

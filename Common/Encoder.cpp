@@ -5,7 +5,7 @@
  *      Author: josue
  */
 
-#include "Encoder.h"
+#include "Encoder.hpp"
 
 Encoder::Encoder(TIM_HandleTypeDef * htimCounter, int int_freq) {
 	// TODO Auto-generated constructor stub

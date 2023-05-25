@@ -19,6 +19,10 @@
 #include <mainpp.h>
 #include <stdlib.h>
 
+//Our libs:
+#include <Encoder.hpp>
+#include <MotorPI.hpp>
+
 /* --- Node handler --- */
 ros::NodeHandle nh;
 

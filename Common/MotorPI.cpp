@@ -5,11 +5,11 @@
  *      Author: josue
  */
 
-#include "MotorPI.h"
+#include "MotorPI.hpp"
 
 
 
-Motor_PI::Motor_PI(Encoder e, TIM_HandleTypeDef * htim) {
+Motor_PI::Motor_PI(Encoder * e, TIM_HandleTypeDef * htim) {
 	// TODO Auto-generated constructor stub
 	enc = e;
 	htimPWM = htim;

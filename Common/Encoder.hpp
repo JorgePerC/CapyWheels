@@ -5,8 +5,8 @@
  *      Author: josue
  */
 
-#ifndef ENCODER_H_
-#define ENCODER_H_
+#ifndef ENCODER_HPP_
+#define ENCODER_HPP_
 /*
  * Create class for encoder
  * * Encoder Resolution
@@ -18,6 +18,9 @@
  * * Invert polarity
  *
 */
+#include "stm32l4xx_hal.h"
+#include <stdio.h>
+
 class Encoder {
 	TIM_HandleTypeDef * htimCounter;
 
@@ -29,7 +32,7 @@ class Encoder {
     int int_freq;
 
     // Compute signal 
-    const float pi = 3.1416;
+    static const float pi = 3.1416;
 	int lastTick;
     float vel;
 
@@ -50,4 +53,4 @@ public:
 	virtual ~Encoder();
 };
 
-#endif /* ENCODER_H_ */
+#endif /* ENCODER_HPP_ */
