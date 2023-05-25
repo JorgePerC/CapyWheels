@@ -34,106 +34,52 @@ uint32_t lastTime_l = 0;
 uint32_t lastTime_r = 0;
 
 float pi = 3.1416;
+
 float w_leftWheel = 0;
 float w_rightWheel = 0;
+
+float w_leftWheel_last = 0;
+float w_rightWheel_last = 0;
+
 const float encoderTickpRev = 537.667;
 
 /* --- Callback functions --- */
 void resetEncoder(){
-	/*
-	int tick_l = TIM4 -> CNT;
-	if (tick_l == lastTick_l ){
-		w_leftWheel = 0.0;
-		//HAL_GPIO_TogglePin (GPIOE, GPIO_PIN_1); // LED amarillo
-	}
 
-	int tick_r = TIM8 -> CNT;
-	if (lastTick_r == tick_r){
-		w_rightWheel = 0.0;
-	}
-
-	// Update
-	lastTick_l = tick_l;
-	lastTick_r = tick_r;
-	*/
 	int tick_l = TIM4 -> CNT;
 	int tick_r = TIM8 -> CNT;
 
 	//uint32_t cur_time = HAL_GetTick();
 
 	// Do so for left wheel
-	if (abs(lastTick_l - tick_l) > 520){
+	if (abs(lastTick_l - tick_l) > 537){
 		tick_l -= 537;
 	}
 	// Do so for left wheel
-	if (abs(lastTick_r - tick_r) > 520){
+	if (abs(lastTick_r - tick_r) > 537){
 		tick_r -= 537;
 	}
 
 	// Update angular velocities:
-	w_rightWheel = 2*pi*(lastTick_r - tick_r)/(encoderTickpRev*(0.005*6.252082554));// * 6.643555243);
-	w_leftWheel = 2*pi*(lastTick_l - tick_l)/(encoderTickpRev*(0.005*6.252082554));
+	w_rightWheel = 2*pi*(lastTick_r - tick_r)/(encoderTickpRev*(0.02));
+	w_leftWheel = 2*pi*(lastTick_l - tick_l)/(encoderTickpRev*(0.02));
+
+	// If the calculated value is bigger than our maximum velocity
+	if (w_rightWheel >  32.0 || w_rightWheel < -32.0){
+		w_rightWheel = w_rightWheel_last;
+	}
+	if (w_leftWheel >  32.0 || w_leftWheel < -32.0 ){
+		w_leftWheel = w_leftWheel_last;
+	}
 
 	// Update tick readout
 	lastTick_r = tick_r;
 	lastTick_l = tick_l;
 
+	w_rightWheel_last = w_rightWheel;
+	w_leftWheel_last = w_leftWheel;
 
-}
 
-void readEncoderVelWl (){
-	// Code to avoid jumps when a revolution is completed
-		// This basically happens when the encoder value changes drastically
-		// from the last value to the new one
-		// TODO: Check how this behaves at fast speeds
-
-	int tick_l = TIM4 -> CNT;
-
-	uint32_t cur_time = HAL_GetTick();
-
-	// Do so for left wheel
-	if (abs(lastTick_l - tick_l) > 510){
-		tick_l -= 537;
-	}
-
-	// Update angular velocities:
-	//w_leftWheel = (float) 2*pi*1000/(encoderTickpRev*(cur_time - lastTime_l));// * 6.643555243);
-	w_leftWheel = 2*pi*(lastTick_l - tick_l)*1000/(encoderTickpRev*(cur_time - lastTime_l));// * 6.643555243);
-
-	// Apply sign
-	/*
-	if (tick_l < lastTick_l){
-		w_leftWheel *= -1;
-	}*/
-
-	// Update tick readout
-	lastTick_l = tick_l;
-	lastTime_l = cur_time;
-	HAL_GPIO_TogglePin (GPIOB, GPIO_PIN_14); // RED
-}
-
-void readEncoderVelWr (){
-	// Code to avoid jumps when a revolution is completed
-		// This basically happens when the encoder value changes drastically
-		// from the last value to the new one
-		// TODO: Check how this behaves at fast speeds
-
-	int tick_r = TIM8 -> CNT;
-
-	uint32_t cur_time = HAL_GetTick();
-
-	// Do so for left wheel
-	if (abs(lastTick_r - tick_r) > 510){
-		tick_r -= 537;
-	}
-
-	// Update angular velocities:
-	w_rightWheel = 2*pi*(lastTick_r - tick_r)*1000/(encoderTickpRev*(cur_time - lastTime_r));// * 6.643555243);
-
-	// Update tick readout
-	lastTick_r = tick_r;
-	lastTime_r = cur_time;
-	HAL_GPIO_TogglePin (GPIOE, GPIO_PIN_1);
 }
 
 float map(float x, float in_min, float in_max, float out_min, float out_max) {

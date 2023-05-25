@@ -77,8 +77,8 @@ all: main-build
 main-build: CapyWheels_CM7.elf secondary-outputs
 
 # Tool invocations
-CapyWheels_CM7.elf CapyWheels_CM7.map: $(OBJS) $(USER_OBJS) /home/rosmelodic/STM32CubeIDE/workspace_1.12.1/CapyWheels/CM7/STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "CapyWheels_CM7.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/rosmelodic/STM32CubeIDE/workspace_1.12.1/CapyWheels/CM7/STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CapyWheels_CM7.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+CapyWheels_CM7.elf CapyWheels_CM7.map: $(OBJS) $(USER_OBJS) /home/josue/Documents/CapyWheels/CM7/STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "CapyWheels_CM7.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/josue/Documents/CapyWheels/CM7/STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CapyWheels_CM7.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
