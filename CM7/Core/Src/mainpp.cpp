@@ -13,8 +13,6 @@
 
 	// Geometry msgs
 #include <geometry_msgs/PoseStamped.h>
-//#include <geometry_msgs/Twist.h>
-//#include <geometry_msgs/Vector3.h>
 
 #include <mainpp.h>
 #include <stdlib.h>
@@ -48,47 +46,6 @@ float w_rightWheel_last = 0;
 const float encoderTickpRev = 537.667;
 
 /* --- Callback functions --- */
-void resetEncoder(){
-
-	int tick_l = TIM4 -> CNT;
-	int tick_r = TIM8 -> CNT;
-
-	//uint32_t cur_time = HAL_GetTick();
-
-	// Do so for left wheel
-	if (abs(lastTick_l - tick_l) > 537){
-		tick_l -= 537;
-	}
-	// Do so for left wheel
-	if (abs(lastTick_r - tick_r) > 537){
-		tick_r -= 537;
-	}
-
-	// Update angular velocities:
-	w_rightWheel = 2*pi*(lastTick_r - tick_r)/(encoderTickpRev*(0.02));
-	w_leftWheel = 2*pi*(lastTick_l - tick_l)/(encoderTickpRev*(0.02));
-
-	// If the calculated value is bigger than our maximum velocity
-	if (w_rightWheel >  32.0 || w_rightWheel < -32.0){
-		w_rightWheel = w_rightWheel_last;
-	}
-	if (w_leftWheel >  32.0 || w_leftWheel < -32.0 ){
-		w_leftWheel = w_leftWheel_last;
-	}
-
-	// Update tick readout
-	lastTick_r = tick_r;
-	lastTick_l = tick_l;
-
-	w_rightWheel_last = w_rightWheel;
-	w_leftWheel_last = w_leftWheel;
-
-
-}
-
-float map(float x, float in_min, float in_max, float out_min, float out_max) {
-	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
 
 /* Since our prescaler was determined to count
 	 * 1 picosecond, we set the pulse by alternating the
@@ -97,28 +54,10 @@ float map(float x, float in_min, float in_max, float out_min, float out_max) {
 void vel_wl_Callback( const std_msgs::Float32 &input_msg){
 	float wl = input_msg.data;
 
-	// Limit wl ranges
-	if (wl > 1.0){
-		wl = 1.0;
-	}else if (wl < -1.0){
-		wl = -1.0;
-	}
-	TIM3->CCR1 = (int) map(wl, -1, 1, 1050, 1950);
 }
 
 void vel_wr_Callback( const std_msgs::Float32 &input_msg){
 	float wr = input_msg.data;
-
-	// We invert the rotation to keep all the math happy :D
-	wr *= -1;
-
-	// Limit wl ranges
-	if (wr > 1.0){
-		wr = 1.0;
-	}else if (wr < -1.0){
-		wr = -1.0;
-	}
-	TIM2->CCR1 = (int) map(wr, -1, 1, 1050, 1950);
 }
 
 /* --- Publishers and subscribers --- */

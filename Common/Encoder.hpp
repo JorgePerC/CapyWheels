@@ -21,6 +21,9 @@
 #include "stm32l4xx_hal.h"
 #include <stdio.h>
 
+namespace LL_Control
+{
+    
 class Encoder {
 	TIM_HandleTypeDef * htimCounter;
 
@@ -52,5 +55,8 @@ public:
 
 	virtual ~Encoder();
 };
+
+} // namespace LL_Control
+
 
 #endif /* ENCODER_HPP_ */

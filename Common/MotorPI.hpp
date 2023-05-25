@@ -25,7 +25,9 @@
  * * Go_to_reference
  *
  * */
-
+namespace LL_Control
+{
+    
 class Motor_PI {
 private:
 	Encoder enc;
@@ -36,7 +38,7 @@ private:
 	float minVel;
         // Cleans encoder reading
 	float lastVel;
-
+    int direction = 1;
 
 
 	// Signal variables
@@ -55,7 +57,7 @@ private:
 	float threshold;
 
         // PI needed values
-	float reference;    // TODO: remove?
+	float reference;   
 	float lastError;
     float intError;
     float lastIntegral;
@@ -73,13 +75,17 @@ public:
 
     void set_encoderFrequency(int f);
     void set_threshold(int f);
+    void set_reference(float ref);
 
 	float get_vel();
 
-	void go_to(float nRef);
+    void invert();
+	void go_to_ref();
     void stop();
 
 	virtual ~Motor_PI();
 };
+
+} // namespace LL_Control
 
 #endif /* MOTORPI_HPP_ */

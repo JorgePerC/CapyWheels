@@ -28,6 +28,9 @@ void Motor_PI::set_MaxVel(float nMax){
 void Motor_PI::set_MinVel(float nMin){
 	minVel = nMin;
 }
+void Motor_PI::set_reference(float ref){
+    reference = direction*ref;
+}
 void Motor_PI::set_Ks(float k_i, float k_p){
 	this->k_i = k_i;
 	this->k_p = k_p;
@@ -46,16 +49,20 @@ float Motor_PI::get_vel(){
 	// Update last reading
 	lastVel = vel;
 
+    // Should we invert this? 
 	return vel;
 }
 
 // ===== Others =====
+void Motor_PI::invert(){
+    direction *= -1;
+}
 int Motor_PI::map(float x){
 	return (int) map(x, minVel, maxVel, minFreqPWM, maxFreqPWM);
 }
 
 
-void Motor_PI::go_to(float nRef){
+void Motor_PI::go_to_ref(){
 
 	// Limit the value if the ref is bigger
         // than our opertarional space
