@@ -679,7 +679,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim){
 	// Since this funcion can be called by any timer, we first check the
 	// interrupt originated from the TIM1
 	if (htim == &htim1){
-		resetEncoder();
+		//resetEncoder();
 	}
 /*
 	if (htim == &htim4){
@@ -701,7 +701,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim){
 void HAL_TIM_IC_CaptureCallback  (TIM_HandleTypeDef * htim){
 	// HAL_TIM_TriggerCallback -> FAILED
 	if (htim == &htim4){
-		readEncoderVelWl ();
+		//readEncoderVelWl ();
 	}
 
 }

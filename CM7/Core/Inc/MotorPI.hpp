@@ -9,7 +9,7 @@
 #define MOTORPI_HPP_
 
 #include <Encoder.hpp>
-#include "stm32l4xx_hal.h"
+#include "stm32h7xx_hal.h"
 
 /*TODO:
  * ============= Attributes
@@ -30,7 +30,7 @@ namespace LL_Control
     
 class Motor_PI {
 private:
-	Encoder enc;
+	Encoder * enc;
 	TIM_HandleTypeDef * htimPWM;
 
 	//Should be defined as radians
@@ -65,7 +65,7 @@ private:
 	// ========== Methods
 	float map(float x, float in_min, float in_max, float out_min, float out_max);
 public:
-	Motor_PI(Encoder e, TIM_HandleTypeDef * htim);
+	Motor_PI(LL_Control::Encoder * e, TIM_HandleTypeDef * htim);
 
 	int map(float x);
 

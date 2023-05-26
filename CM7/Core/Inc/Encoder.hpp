@@ -18,7 +18,7 @@
  * * Invert polarity
  *
 */
-#include "stm32l4xx_hal.h"
+#include "stm32h7xx_hal.h"
 #include <stdio.h>
 
 namespace LL_Control
@@ -27,7 +27,7 @@ namespace LL_Control
 class Encoder {
 	TIM_HandleTypeDef * htimCounter;
 
-    // Enchoder characterization 
+    // Encoder characterization
     float encoderRes;
 	int ticksPerRevolution;
 
@@ -35,7 +35,7 @@ class Encoder {
     int int_freq;
 
     // Compute signal 
-    static const float pi = 3.1416;
+    static constexpr float pi = 3.1416;
 	int lastTick;
     float vel;
 
@@ -45,7 +45,7 @@ class Encoder {
 
 public:
 	Encoder(TIM_HandleTypeDef * htimCounter, int int_freq);
-	
+	Encoder();
     void set_encoderRes(float res);
 
     

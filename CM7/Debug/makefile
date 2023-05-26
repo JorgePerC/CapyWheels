@@ -51,34 +51,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := CapyWheels_CM7
+BUILD_ARTIFACT_NAME := CapyWheelsClean_CM7
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-CapyWheels_CM7.elf \
+CapyWheelsClean_CM7.elf \
 
 MAP_FILES += \
-CapyWheels_CM7.map \
+CapyWheelsClean_CM7.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-CapyWheels_CM7.list \
+CapyWheelsClean_CM7.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: CapyWheels_CM7.elf secondary-outputs
+main-build: CapyWheelsClean_CM7.elf secondary-outputs
 
 # Tool invocations
-CapyWheels_CM7.elf CapyWheels_CM7.map: $(OBJS) $(USER_OBJS) /home/josue/Documents/CapyWheels/CM7/STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "CapyWheels_CM7.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/josue/Documents/CapyWheels/CM7/STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CapyWheels_CM7.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+CapyWheelsClean_CM7.elf CapyWheelsClean_CM7.map: $(OBJS) $(USER_OBJS) /home/josue/STM32CubeIDE/workspace_1.12.0/CapyWheelsClean/CM7/STM32H745ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "CapyWheelsClean_CM7.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/josue/STM32CubeIDE/workspace_1.12.0/CapyWheelsClean/CM7/STM32H745ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CapyWheelsClean_CM7.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -87,14 +87,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-CapyWheels_CM7.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "CapyWheels_CM7.list"
+CapyWheelsClean_CM7.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "CapyWheelsClean_CM7.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) CapyWheels_CM7.elf CapyWheels_CM7.list CapyWheels_CM7.map default.size.stdout
+	-$(RM) CapyWheelsClean_CM7.elf CapyWheelsClean_CM7.list CapyWheelsClean_CM7.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

@@ -9,6 +9,6 @@ main.c:533:13:MX_USART3_UART_Init	5
 main.c:581:13:MX_USB_OTG_FS_PCD_Init	2
 main.c:615:13:MX_DMA_Init	1
 main.c:636:13:MX_GPIO_Init	1
-main.c:678:6:HAL_TIM_PeriodElapsedCallback	2
-main.c:701:6:HAL_TIM_IC_CaptureCallback	2
+main.c:678:6:HAL_TIM_PeriodElapsedCallback	1
+main.c:701:6:HAL_TIM_IC_CaptureCallback	1
 main.c:715:6:Error_Handler	1

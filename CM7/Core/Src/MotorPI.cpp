@@ -9,36 +9,43 @@
 
 
 
-Motor_PI::Motor_PI(Encoder * e, TIM_HandleTypeDef * htim) {
+LL_Control::Motor_PI::Motor_PI(LL_Control::Encoder * e, TIM_HandleTypeDef * htim) {
 	// TODO Auto-generated constructor stub
 	enc = e;
 	htimPWM = htim;
-    encoderFrequency = enc.get_frequency();
+    encoderFrequency = enc->get_frequency();
 }
 
-Motor_PI::~Motor_PI() {
+LL_Control::Motor_PI::~Motor_PI() {
 	// TODO Auto-generated destructor stub
 }
 
 // ===== Setters =====
 
-void Motor_PI::set_MaxVel(float nMax){
+void LL_Control::Motor_PI::set_MaxVel(float nMax){
 	maxVel = nMax;
 }
-void Motor_PI::set_MinVel(float nMin){
+void LL_Control::Motor_PI::set_MinVel(float nMin){
 	minVel = nMin;
 }
-void Motor_PI::set_reference(float ref){
+void LL_Control::Motor_PI::set_reference(float ref){
+	// Limit the value if the ref is bigger
+        // than our opertarional space
+	if (ref > maxVel){
+		ref = maxVel;
+	}else if (ref < minVel){
+		ref = minVel;
+	}
     reference = direction*ref;
 }
-void Motor_PI::set_Ks(float k_i, float k_p){
+void LL_Control::Motor_PI::set_Ks(float k_i, float k_p){
 	this->k_i = k_i;
 	this->k_p = k_p;
 }
 // ===== Getters =====
-float Motor_PI::get_vel(){
+float LL_Control::Motor_PI::get_vel(){
 
-	float vel = enc.get_vel();
+	float vel = enc->get_vel();
 	// Sometimes it overflows into an invalid value
 		// We double check to clean even more the data
 	// If the calculated value is bigger than our maximum velocity
@@ -54,25 +61,18 @@ float Motor_PI::get_vel(){
 }
 
 // ===== Others =====
-void Motor_PI::invert(){
+void LL_Control::Motor_PI::invert(){
     direction *= -1;
 }
-int Motor_PI::map(float x){
+int LL_Control::Motor_PI::map(float x){
 	return (int) map(x, minVel, maxVel, minFreqPWM, maxFreqPWM);
 }
 
 
-void Motor_PI::go_to_ref(){
+void LL_Control::Motor_PI::go_to_ref(){
 
-	// Limit the value if the ref is bigger
-        // than our opertarional space
-	if (nRef > maxVel){
-		nRef = maxVel;
-	}else if (nRef < minVel){
-		nRef = minVel;
-	}
     // ===== #CONTROL =====
-	float error = nRef - get_vel();
+	float error = reference - get_vel();
 
 	// Since we are not working with tasks, we can't actually make whiles
 	if (error <= threshold && error >= -threshold){
@@ -91,7 +91,7 @@ void Motor_PI::go_to_ref(){
     float control = k_p*error  + k_i*intTerm;
 
     // Actually move motor
-    htimPWM -> CCR1 = (int) map(control);
+    htimPWM -> Instance-> CCR1 = (int) map(control);
 
     // Update integral component
     lastIntegral = intTerm;
@@ -100,7 +100,7 @@ void Motor_PI::go_to_ref(){
 
 }
 
-void Motor_PI::stop(){
-    go_to(0);
+void LL_Control::Motor_PI::stop(){
+	set_reference(0.0);
 }
 

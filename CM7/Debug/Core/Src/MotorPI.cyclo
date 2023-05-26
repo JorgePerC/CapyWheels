@@ -1,0 +1,12 @@
+MotorPI.cpp:12:1:LL_Control::Motor_PI::Motor_PI(LL_Control::Encoder*, TIM_HandleTypeDef*)	1
+MotorPI.cpp:19:1:LL_Control::Motor_PI::~Motor_PI()	1
+MotorPI.cpp:19:1:virtual LL_Control::Motor_PI::~Motor_PI()	1
+MotorPI.cpp:25:6:void LL_Control::Motor_PI::set_MaxVel(float)	1
+MotorPI.cpp:28:6:void LL_Control::Motor_PI::set_MinVel(float)	1
+MotorPI.cpp:31:6:void LL_Control::Motor_PI::set_reference(float)	3
+MotorPI.cpp:41:6:void LL_Control::Motor_PI::set_Ks(float, float)	1
+MotorPI.cpp:46:7:float LL_Control::Motor_PI::get_vel()	3
+MotorPI.cpp:64:6:void LL_Control::Motor_PI::invert()	1
+MotorPI.cpp:67:5:int LL_Control::Motor_PI::map(float)	1
+MotorPI.cpp:72:6:void LL_Control::Motor_PI::go_to_ref()	3
+MotorPI.cpp:103:6:void LL_Control::Motor_PI::stop()	1
