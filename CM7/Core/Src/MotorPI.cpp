@@ -9,11 +9,26 @@
 
 
 
-LL_Control::Motor_PI::Motor_PI(LL_Control::Encoder * e, TIM_HandleTypeDef * htim) {
-	// TODO Auto-generated constructor stub
+LL_Control::Motor_PI::Motor_PI(LL_Control::Encoder * e, TIM_HandleTypeDef * htim, int minFreq, int maxFreq) {
+
 	enc = e;
 	htimPWM = htim;
-    encoderFrequency = enc->get_frequency();
+
+	runFrequency = enc->get_frequency();
+    // Velocity
+    set_MaxVel(32.0f);
+    set_MinVel(-32.0f);
+    // Frequency
+    minFreqPWM = minFreq;
+    maxFreqPWM = maxFreq;
+    // Threshold
+    set_threshold(0.5);
+
+	// Init PWM timers
+	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
+
+    // Don't move
+    stop();
 }
 
 LL_Control::Motor_PI::~Motor_PI() {
@@ -30,7 +45,7 @@ void LL_Control::Motor_PI::set_MinVel(float nMin){
 }
 void LL_Control::Motor_PI::set_reference(float ref){
 	// Limit the value if the ref is bigger
-        // than our opertarional space
+        // than our operational space
 	if (ref > maxVel){
 		ref = maxVel;
 	}else if (ref < minVel){
@@ -42,6 +57,13 @@ void LL_Control::Motor_PI::set_Ks(float k_i, float k_p){
 	this->k_i = k_i;
 	this->k_p = k_p;
 }
+void LL_Control::Motor_PI::set_runFrequency(int f){
+	runFrequency = f;
+}
+void LL_Control::Motor_PI::set_threshold(float t){
+	threshold = t;
+}
+
 // ===== Getters =====
 float LL_Control::Motor_PI::get_vel(){
 
@@ -64,10 +86,12 @@ float LL_Control::Motor_PI::get_vel(){
 void LL_Control::Motor_PI::invert(){
     direction *= -1;
 }
+float LL_Control::Motor_PI::map(float x, float in_min, float in_max, float out_min, float out_max){
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 int LL_Control::Motor_PI::map(float x){
 	return (int) map(x, minVel, maxVel, minFreqPWM, maxFreqPWM);
 }
-
 
 void LL_Control::Motor_PI::go_to_ref(){
 
@@ -84,14 +108,19 @@ void LL_Control::Motor_PI::go_to_ref(){
     // Update error on integral term
     intError += error;
     // Calculate integral component
-    float intTerm = (1000/encoderFrequency)*intError + lastIntegral;
+    /* Since our prescaler was determined to count
+    	 * 1 picosecond, we set the pulse by alternating the
+    	 * CCR value.
+    	 * */
+    float intTerm = (1000/runFrequency)*intError + lastIntegral;
 
     // Regulate voltage to motor
         // Sadly, it isn't torque ;(
     float control = k_p*error  + k_i*intTerm;
 
     // Actually move motor
-    htimPWM -> Instance-> CCR1 = (int) map(control);
+    __HAL_TIM_SET_COMPARE(htimPWM, TIM_CHANNEL_1, control);
+    //htimPWM -> Instance-> CCR1 = (int) map(control);
 
     // Update integral component
     lastIntegral = intTerm;

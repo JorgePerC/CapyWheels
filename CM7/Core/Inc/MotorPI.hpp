@@ -38,20 +38,19 @@ private:
 	float minVel;
         // Cleans encoder reading
 	float lastVel;
+		// To easily invert readings
     int direction = 1;
-
 
 	// Signal variables
 	int maxFreqPWM;
 	int minFreqPWM;
 
-    int encoderFrequency;
-
+    int runFrequency;
 
 	// Control variables
         // Gains
-	float k_i;
-	float k_p;
+	float k_i = 1;
+	float k_p = 1;
 
         // Set-point closeness
 	float threshold;
@@ -65,7 +64,7 @@ private:
 	// ========== Methods
 	float map(float x, float in_min, float in_max, float out_min, float out_max);
 public:
-	Motor_PI(LL_Control::Encoder * e, TIM_HandleTypeDef * htim);
+	Motor_PI(LL_Control::Encoder * e, TIM_HandleTypeDef * htim, int minFreq, int maxFreq);
 
 	int map(float x);
 
@@ -73,8 +72,8 @@ public:
 	void set_MinVel(float nMin);
     void set_Ks(float k_i, float k_p);
 
-    void set_encoderFrequency(int f);
-    void set_threshold(int f);
+    void set_runFrequency(int f);
+    void set_threshold(float t);
     void set_reference(float ref);
 
 	float get_vel();

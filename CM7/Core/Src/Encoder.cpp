@@ -7,10 +7,15 @@
 
 #include "Encoder.hpp"
 
-LL_Control::Encoder::Encoder(TIM_HandleTypeDef * htimCounter, int int_freq) {
-	// TODO Auto-generated constructor stub
-	this->htimCounter = htimCounter;
+LL_Control::Encoder::Encoder(TIM_HandleTypeDef * htim, int int_freq) {
+
+	// Assignments
+	this->htimCounter = htim;
 	this->int_freq = int_freq;
+
+	set_encoderRes (537.667);
+	// Init encoder
+	HAL_TIM_Encoder_Start_IT(htim, TIM_CHANNEL_ALL);
 }
 LL_Control::Encoder::Encoder(){
 
@@ -18,7 +23,13 @@ LL_Control::Encoder::Encoder(){
 LL_Control::Encoder::~Encoder() {
 	// TODO Auto-generated destructor stub
 }
-
+void LL_Control::Encoder::set_ticksPR(int ticks){
+	ticksPerRevolution = ticks;
+}
+void LL_Control::Encoder::set_encoderRes(float res){
+	encoderRes = res;
+	set_ticksPR((int) std::ceil(res) );
+}
 float LL_Control::Encoder::get_vel(){
 	return vel;
 }
@@ -28,12 +39,14 @@ int LL_Control::Encoder::get_frequency(){
 }
 
 void LL_Control::Encoder::update(){
-    	int tick = htimCounter->Instance->CNT;
+
+	int tick =__HAL_TIM_GET_COUNTER(htimCounter);
+	//int tick = htimCounter->Instance->CNT;
 
 	// Code to avoid jumps when a revolution is completed
 		// This basically happens when the encoder value changes drastically
 		// from the last value to the new one
-	if (abs(lastTick - tick) > 510){
+	if (std::abs(lastTick - tick) > 510){
 		tick -= 537;
 	}
 

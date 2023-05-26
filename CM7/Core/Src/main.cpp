@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "mainpp.h"
+#include <Encoder.hpp>
+#include <MotorPI.hpp>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,10 +60,21 @@ DMA_HandleTypeDef hdma_usart3_tx;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-
+// =========================
 // NOTE: YOU SHOULD CHANGE THIS DEPENDING ON THE
 // FREQUENCY YOU READ THE ENCODER
-float EncoderReadoutPeriod = 0.005;
+// =========================
+#define updateFreq 20
+#define GobildaMinFreq 1050
+#define GobildaMaxFreq 1950
+
+/* --- Motors & Encoders --- */
+	// TODO: Check orientations
+LL_Control::Encoder encoderL(&htim4, updateFreq);
+LL_Control::Encoder encoderR(&htim8, updateFreq);
+LL_Control::Motor_PI motorL(&encoderL, &htim2, GobildaMinFreq, GobildaMaxFreq);
+LL_Control::Motor_PI motorR(&encoderR, &htim3, GobildaMinFreq, GobildaMaxFreq);
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -152,34 +165,11 @@ Error_Handler();
   /* USER CODE BEGIN 2 */
 
   // Init timer for delta time response with interrupts
-  //HAL_TIM_Base_Start_IT(&htim1);
-  // Init PWM timers
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-
-  // Init encoders
   HAL_TIM_Base_Start_IT(&htim1);
 
-  HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
-  HAL_TIM_Encoder_Start_IT(&htim8, TIM_CHANNEL_ALL);
-
-  //__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE);
-  //__HAL_TIM_ENABLE_IT(&htim4, TIM_IT_TRIGGER);
-  //__HAL_TIM_ENABLE_IT(&htim8, TIM_IT_UPDATE);
-  	  /* Tried:
-  	   * TIM_IT_CC1 -> failed
-  	   * TIM_IT_CC2 -> failed
-  	   * TIM_IT_CC3 -> failed
-  	   * TIM_IT_CC4 -Z failed
-  	   * TIM_IT_UPDATE -> weird data
-  	   * TIM_IT_COM -> failed
-  	   * TIM_IT_TRIGGER -> failed
-  	   * TIM_IT_BREAK -> failed
-  	   */
-  //__HAL_TIM_ENABLE_IT(&htim4, TIM_IT_UPDATE);
-  //__HAL_TIM_ENABLE_IT(&htim8, TIM_IT_CC1 );
-
-
+  	  // No need to init encoders nor motors, since it's done at the constructor
+  motorL.set_Ks(10.0f, 5);
+  motorR.set_Ks(10.0f, 5);
 
   // Setup Node handler
   setup();
@@ -679,24 +669,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim){
 	// Since this funcion can be called by any timer, we first check the
 	// interrupt originated from the TIM1
 	if (htim == &htim1){
+		encoderR.update();
+		encoderL.update();
 		//resetEncoder();
 	}
-/*
-	if (htim == &htim4){
-		readEncoderVelWl ();
-		//HAL_GPIO_TogglePin (GPIOE, GPIO_PIN_1);  // yellow LED
 
-	}
-	if (htim == &htim8){
-		readEncoderVelWr ();
-		//HAL_GPIO_TogglePin (GPIOB, GPIO_PIN_14); // RED LED
-	}
-
-	if (htim == &htim8){
-			readEncoderVelWr ();
-			//HAL_GPIO_TogglePin (GPIOB, GPIO_PIN_14); // RED LED
-		}
-		*/
 }
 void HAL_TIM_IC_CaptureCallback  (TIM_HandleTypeDef * htim){
 	// HAL_TIM_TriggerCallback -> FAILED

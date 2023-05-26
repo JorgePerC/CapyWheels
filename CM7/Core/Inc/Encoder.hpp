@@ -19,7 +19,8 @@
  *
 */
 #include "stm32h7xx_hal.h"
-#include <stdio.h>
+//#include <stdio.h>
+#include <cmath>
 
 namespace LL_Control
 {
@@ -40,14 +41,14 @@ class Encoder {
     float vel;
 
 	// ===== Methods
-    void update();
+
     void set_ticksPR(int ticks);
 
 public:
-	Encoder(TIM_HandleTypeDef * htimCounter, int int_freq);
+	Encoder(TIM_HandleTypeDef * htim, int int_freq);
 	Encoder();
     void set_encoderRes(float res);
-
+    void update();
     
     float get_vel();
     int get_frequency();

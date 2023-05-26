@@ -1,7 +1,10 @@
+cmath:165:3:constexpr float std::ceil(float)	1
 Encoder.cpp:10:1:LL_Control::Encoder::Encoder(TIM_HandleTypeDef*, int)	1
-Encoder.cpp:15:1:LL_Control::Encoder::Encoder()	1
-Encoder.cpp:18:1:LL_Control::Encoder::~Encoder()	1
-Encoder.cpp:18:1:virtual LL_Control::Encoder::~Encoder()	1
-Encoder.cpp:22:7:float LL_Control::Encoder::get_vel()	1
-Encoder.cpp:26:5:int LL_Control::Encoder::get_frequency()	1
-Encoder.cpp:30:6:void LL_Control::Encoder::update()	2
+Encoder.cpp:20:1:LL_Control::Encoder::Encoder()	1
+Encoder.cpp:23:1:LL_Control::Encoder::~Encoder()	1
+Encoder.cpp:23:1:virtual LL_Control::Encoder::~Encoder()	1
+Encoder.cpp:26:6:void LL_Control::Encoder::set_ticksPR(int)	1
+Encoder.cpp:29:6:void LL_Control::Encoder::set_encoderRes(float)	1
+Encoder.cpp:33:7:float LL_Control::Encoder::get_vel()	1
+Encoder.cpp:37:5:int LL_Control::Encoder::get_frequency()	1
+Encoder.cpp:41:6:void LL_Control::Encoder::update()	2
