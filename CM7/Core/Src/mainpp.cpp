@@ -101,8 +101,8 @@ void loop(void)
 	}
 
 		// Update data on ros msg
-		wl.data = motorR.get_vel();
-		wr.data = motorL.get_vel();
+		wr.data = motorR.get_vel();
+		wl.data = motorL.get_vel();
 
 		// Send Message
 		wl_pub.publish(&wl);

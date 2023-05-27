@@ -60,6 +60,9 @@ private:
 	float lastError;
     float intError;
     float lastIntegral;
+    // Just to see them on a graph
+    float error;
+    float control;
 
 	// ========== Methods
 	float map(float x, float in_min, float in_max, float out_min, float out_max);

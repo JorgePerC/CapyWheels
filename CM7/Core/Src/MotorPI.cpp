@@ -22,10 +22,7 @@ LL_Control::Motor_PI::Motor_PI(LL_Control::Encoder * e, TIM_HandleTypeDef * htim
     minFreqPWM = minFreq;
     maxFreqPWM = maxFreq;
     // Threshold
-    set_threshold(0.5);
-
-	// Init PWM timers
-	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
+    set_threshold(0.05);
 
     // Don't move
     stop();
@@ -90,13 +87,18 @@ float LL_Control::Motor_PI::map(float x, float in_min, float in_max, float out_m
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 int LL_Control::Motor_PI::map(float x){
+	if (x > maxVel){
+		x = maxVel;
+	}else if (x < minVel){
+		x = minVel;
+	}
 	return (int) map(x, minVel, maxVel, minFreqPWM, maxFreqPWM);
 }
 
 void LL_Control::Motor_PI::go_to_ref(){
 
     // ===== #CONTROL =====
-	float error = reference - get_vel();
+	error = reference - get_vel();
 
 	// Since we are not working with tasks, we can't actually make whiles
 	if (error <= threshold && error >= -threshold){
@@ -106,27 +108,25 @@ void LL_Control::Motor_PI::go_to_ref(){
     // If we are not on the threshold, keep altering PWM pulse
     
     // Update error on integral term
-    intError += error;
+    intError += (float) (1.0f/runFrequency)*error ;
     // Calculate integral component
     /* Since our prescaler was determined to count
     	 * 1 picosecond, we set the pulse by alternating the
     	 * CCR value.
     	 * */
-    float intTerm = (1000/runFrequency)*intError + lastIntegral;
+    //float intTerm = (1000/runFrequency)*error + lastError;
 
     // Regulate voltage to motor
         // Sadly, it isn't torque ;(
-    float control = k_p*error  + k_i*intTerm;
+    control += (float) (1.0f/runFrequency)*(k_p*error + k_i*intError);
+
 
     // Actually move motor
-    __HAL_TIM_SET_COMPARE(htimPWM, TIM_CHANNEL_1, control);
-    //htimPWM -> Instance-> CCR1 = (int) map(control);
+    //__HAL_TIM_SET_COMPARE(htimPWM, TIM_CHANNEL_1, control);
+    htimPWM -> Instance-> CCR1 = map(control);
 
     // Update integral component
-    lastIntegral = intTerm;
-        
-	
-
+    //lastIntegral = intTerm;
 }
 
 void LL_Control::Motor_PI::stop(){

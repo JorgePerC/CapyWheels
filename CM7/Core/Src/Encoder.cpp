@@ -14,8 +14,7 @@ LL_Control::Encoder::Encoder(TIM_HandleTypeDef * htim, int int_freq) {
 	this->int_freq = int_freq;
 
 	set_encoderRes (537.667);
-	// Init encoder
-	HAL_TIM_Encoder_Start_IT(htim, TIM_CHANNEL_ALL);
+
 }
 LL_Control::Encoder::Encoder(){
 
@@ -40,14 +39,16 @@ int LL_Control::Encoder::get_frequency(){
 
 void LL_Control::Encoder::update(){
 
+	//HAL_GPIO_WritePin (GPIOE, GPIO_PIN_1, GPIO_PIN_SET);
+
 	int tick =__HAL_TIM_GET_COUNTER(htimCounter);
 	//int tick = htimCounter->Instance->CNT;
 
 	// Code to avoid jumps when a revolution is completed
 		// This basically happens when the encoder value changes drastically
 		// from the last value to the new one
-	if (std::abs(lastTick - tick) > 510){
-		tick -= 537;
+	if (std::abs(lastTick - tick) > ticksPerRevolution - 1){
+		tick -= ticksPerRevolution;
 	}
 
 	// Update angular velocities:

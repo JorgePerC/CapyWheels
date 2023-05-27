@@ -72,8 +72,8 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 	// TODO: Check orientations
 LL_Control::Encoder encoderL(&htim4, updateFreq);
 LL_Control::Encoder encoderR(&htim8, updateFreq);
-LL_Control::Motor_PI motorL(&encoderL, &htim2, GobildaMinFreq, GobildaMaxFreq);
-LL_Control::Motor_PI motorR(&encoderR, &htim3, GobildaMinFreq, GobildaMaxFreq);
+LL_Control::Motor_PI motorL(&encoderL, &htim3, GobildaMinFreq, GobildaMaxFreq);
+LL_Control::Motor_PI motorR(&encoderR, &htim2, GobildaMinFreq, GobildaMaxFreq);
 
 /* USER CODE END PV */
 
@@ -166,10 +166,20 @@ Error_Handler();
 
   // Init timer for delta time response with interrupts
   HAL_TIM_Base_Start_IT(&htim1);
+  // Init encoder
+  	HAL_TIM_Encoder_Start_IT(&htim4, TIM_CHANNEL_ALL);
+  	HAL_TIM_Encoder_Start_IT(&htim8, TIM_CHANNEL_ALL);
+
+  	// Init PWM timers
+  	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
   	  // No need to init encoders nor motors, since it's done at the constructor
   motorL.set_Ks(10.0f, 5);
   motorR.set_Ks(10.0f, 5);
+
+  motorR.invert();
+
 
   // Setup Node handler
   setup();
@@ -671,6 +681,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim){
 	if (htim == &htim1){
 		encoderR.update();
 		encoderL.update();
+
 		//resetEncoder();
 	}
 
