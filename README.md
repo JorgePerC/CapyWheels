@@ -17,3 +17,8 @@ Using the Nucleo-144 | STM32H745 board
 
 ## Generating a PWM signal
 
+
+## Mixing C++ and C
+[Simple tutorial](https://shawnhymel.com/1941/how-to-use-c-with-stm32cubeide/)
+[Example Repo](https://github.com/BradenSunwold/stm32-hal-with-cpp/blob/main/Core/Src/CppBlinkPinout.cpp)
+[Full explanation] (https://www.oracle.com/technical-resources/articles/it-infrastructure/mixing-c-and-cplusplus.html)
