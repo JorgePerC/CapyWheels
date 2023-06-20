@@ -15,10 +15,12 @@ Using the Nucleo-144 | STM32H745 board
 
 [Another example](https://www.yashkudale.com/electronics/design-tips-use-peripherals-where-ever-possible/)
 
-## Generating a PWM signal
-
-
 ## Mixing C++ and C
 [Simple tutorial](https://shawnhymel.com/1941/how-to-use-c-with-stm32cubeide/)
 [Example Repo](https://github.com/BradenSunwold/stm32-hal-with-cpp/blob/main/Core/Src/CppBlinkPinout.cpp)
 [Full explanation] (https://www.oracle.com/technical-resources/articles/it-infrastructure/mixing-c-and-cplusplus.html)
+
+## Documentation-ish:
+
+![UML](imgs/UML%20Motores.drawio.png)
+![Connections](imgs/EmbeddedDiagram.png)
